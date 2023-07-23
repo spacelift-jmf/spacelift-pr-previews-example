@@ -1,0 +1,69 @@
+name: Register PR preview
+
+on:
+  pull_request:
+    types: [edited, opened, reopened, synchronize]
+
+jobs:
+  list-changed-directories:
+    name: List changed directories
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check source code out
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: List changed directories
+        id: changed-files
+        uses: tj-actions/changed-files@v37
+        with:
+          dir_names: true
+          files_ignore: .github/**
+          json: true
+
+      - name: Generate matrix with all changed directories
+        id: set-matrix
+        run: echo "matrix={\"dirs\":${{ steps.changed-files.outputs.all_changed_files }}}" >> $GITHUB_OUTPUT
+
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+
+  register-pr-preview:
+    if: ${{ fromJson(needs.list-changed-directories.outputs.matrix) }}
+    name: Register PR preview
+    needs: [list-changed-directories]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.list-changed-directories.outputs.matrix) }}
+      max-parallel: 4
+
+    steps:
+      - name: Generate PR preview ID
+        id: generate-pr-preview-id
+        run: echo "pr-preview-id=$(echo -n \"${{ github.event.organization.login }}${{ github.event.repository.name }}${{ github.event.number }}\" | sha256sum | cut -d " " -f 1 | head -c 7)" >> $GITHUB_OUTPUT
+
+      - name: Register PR preview
+        uses: spacelift-io/update-file-action@v1.0.0
+        with:
+          github-token: ${{ secrets.PR_PREVIEW_GH_TOKEN }}
+          owner: ${{ vars.PR_PREVIEW_GH_OWNER }}
+          repository: ${{ vars.PR_PREVIEW_GH_REPOSITORY }}
+          commit-message: "Register PR preview ${{ steps.generate-pr-preview-id.outputs.pr-preview-id }}"
+          target-file-path: "monitored-stacks/${{ matrix.dirs }}/preview-stacks/${{ github.event.organization.login }}-${{ github.event.repository.name }}-${{ github.event.number }}-${{ steps.generate-pr-preview-id.outputs.pr-preview-id }}.tf"
+          content: |
+            module "${{ github.event.organization.login }}_${{ github.event.repository.name }}_${{ github.event.number }}_${{ steps.generate-pr-preview-id.outputs.pr-preview-id }}" {
+              source = "../template"
+
+              aws_cloud_integration_id = var.aws_cloud_integration_id
+              branch                   = "${{ github.event.pull_request.head.ref }}"
+              policy_ids               = var.policy_ids
+              preview_id               = "${{ steps.generate-pr-preview-id.outputs.pr-preview-id }}"
+              space_id                 = var.space_id
+
+              providers = {
+                spacelift = spacelift
+              }
+            }
