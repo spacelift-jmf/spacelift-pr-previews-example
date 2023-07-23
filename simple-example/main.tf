@@ -6,3 +6,7 @@ resource "random_string" "value_2" {
   length  = 32
   special = false
 }
+
+resource "random_string" "value_3" {
+  length  = 20
+}
