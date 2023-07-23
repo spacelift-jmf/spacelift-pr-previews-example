@@ -1,0 +1,35 @@
+name: Register PR preview
+
+on:
+  pull_request:
+    types: [edited, opened, reopened, synchronize]
+
+jobs:
+  pr-preview:
+    name: Register PR preview
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Generate PR preview ID
+        id: generate-pr-preview-id
+        run: |
+          echo "::set-output name=pr-preview-id::$(echo -n \"${{ github.event.organization.login }}${{ github.event.repository.name }}${{ github.event.number }}\" | sha256sum | cut -d " " -f 1 | head -c 7)"
+      - name: Register PR preview
+        uses: spacelift-io/update-file-action@v1.0.0
+        with:
+          github-token: ${{ secrets.PR_PREVIEW_GH_TOKEN }}
+          owner: spacelift-jmf
+          repository: spacelift-pr-previews
+          commit-message: "Register PR preview ${{ steps.generate-pr-preview-id.outputs.pr-preview-id }}"
+          target-file-path: 'simple-example/previews/${{ github.event.organization.login }}-${{ github.event.repository.name }}-${{ github.event.number }}-${{ steps.generate-pr-preview-id.outputs.pr-preview-id }}.tf'
+          content: |
+            module "${{ github.event.organization.login }}_${{ github.event.repository.name }}_${{ github.event.number }}_${{ steps.calculate-environment-id.outputs.environment }}" {
+              source = "../template"
+
+              branch        = "${{ github.event.pull_request.head.ref }}"
+              pr_preview_id = "${{ steps.generate-pr-preview-id.outputs.pr-preview-id }}"
+
+              providers = {
+                spacelift = spacelift
+              }
+            }
