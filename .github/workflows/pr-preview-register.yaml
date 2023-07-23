@@ -26,8 +26,8 @@ jobs:
             module "${{ github.event.organization.login }}_${{ github.event.repository.name }}_${{ github.event.number }}_${{ steps.calculate-environment-id.outputs.environment }}" {
               source = "../template"
 
-              branch        = "${{ github.event.pull_request.head.ref }}"
-              pr_preview_id = "${{ steps.generate-pr-preview-id.outputs.pr-preview-id }}"
+              branch     = "${{ github.event.pull_request.head.ref }}"
+              preview_id = "${{ steps.generate-pr-preview-id.outputs.pr-preview-id }}"
 
               providers = {
                 spacelift = spacelift
