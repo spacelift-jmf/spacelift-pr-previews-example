@@ -21,5 +21,5 @@ jobs:
           owner: spacelift-jmf
           repository: spacelift-pr-previews
           commit-message: "Unregister PR preview ${{ steps.generate-pr-preview-id.outputs.pr-preview-id }}"
-          target-file-path: "manager/monitored-stacks/simple-example/preview-stacks/${{ github.event.organization.login }}-${{ github.event.repository.name }}-${{ github.event.number }}-${{ steps.generate-pr-preview-id.outputs.pr-preview-id }}.tf"
+          target-file-path: "monitored-stacks/simple-example/preview-stacks/${{ github.event.organization.login }}-${{ github.event.repository.name }}-${{ github.event.number }}-${{ steps.generate-pr-preview-id.outputs.pr-preview-id }}.tf"
           delete: true
