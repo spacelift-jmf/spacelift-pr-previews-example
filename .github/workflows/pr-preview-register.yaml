@@ -23,7 +23,7 @@ jobs:
           commit-message: "Register PR preview ${{ steps.generate-pr-preview-id.outputs.pr-preview-id }}"
           target-file-path: "monitored-stacks/simple-example/preview-stacks/${{ github.event.organization.login }}-${{ github.event.repository.name }}-${{ github.event.number }}-${{ steps.generate-pr-preview-id.outputs.pr-preview-id }}.tf"
           content: |
-            module "${{ github.event.organization.login }}_${{ github.event.repository.name }}_${{ github.event.number }}_${{ steps.calculate-environment-id.outputs.environment }}" {
+            module "${{ github.event.organization.login }}_${{ github.event.repository.name }}_${{ github.event.number }}_${{ steps.generate-pr-preview-id.outputs.pr-preview-id }}" {
               source = "../template"
 
               branch     = "${{ github.event.pull_request.head.ref }}"
