@@ -26,10 +26,11 @@ jobs:
             module "${{ github.event.organization.login }}_${{ github.event.repository.name }}_${{ github.event.number }}_${{ steps.generate-pr-preview-id.outputs.pr-preview-id }}" {
               source = "../template"
 
-              branch     = "${{ github.event.pull_request.head.ref }}"
-              policy_ids = var.policy_ids
-              preview_id = "${{ steps.generate-pr-preview-id.outputs.pr-preview-id }}"
-              space_id   = var.space_id
+              aws_cloud_integration_id = var.aws_cloud_integration_id
+              branch                   = "${{ github.event.pull_request.head.ref }}"
+              policy_ids               = var.policy_ids
+              preview_id               = "${{ steps.generate-pr-preview-id.outputs.pr-preview-id }}"
+              space_id                 = var.space_id
 
               providers = {
                 spacelift = spacelift
