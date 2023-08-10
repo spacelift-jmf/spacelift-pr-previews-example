@@ -3,6 +3,6 @@ resource "random_string" "value_1" {
 }
 
 resource "random_string" "value_2" {
-  length  = 34
+  length  = 36
   special = false
 }
