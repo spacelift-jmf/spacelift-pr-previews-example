@@ -31,7 +31,7 @@ jobs:
       - name: Generate matrix with all changed directories
         id: set-matrix
         run: |
-          echo '${{ steps.changed-files.outputs.all_changed_files }}'
+          echo "{\"dirs\":${{ steps.changed-files.outputs.all_changed_files }}}"
 
     outputs:
       matrix: ${{ steps.set-matrix.outputs.result }}
@@ -47,7 +47,7 @@ jobs:
 
     steps:
       - name: Test matrix
-        run: echo '${{ matrix }}'
+        run: echo '${{ matrix.dirs }}'
 
       - name: Generate PR preview ID
         id: generate-pr-preview-id
