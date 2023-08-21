@@ -30,13 +30,13 @@ jobs:
 
       - name: Generate matrix with all changed directories
         id: set-matrix
-        run: echo "{\"dirs\":${{ steps.changed-files.outputs.all_changed_files }}}"
+        run: echo "::set-output name=matrix::{\"dirs\":${{ steps.changed-files.outputs.all_changed_files }}}"
 
     outputs:
-      matrix: ${{ steps.set-matrix.outputs.result }}
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
 
   pr-preview:
-    # if: ${{ fromJson(needs.list-changed-directories.outputs.matrix) }}
+    if: ${{ fromJson(needs.list-changed-directories.outputs.matrix) }}
     name: Register PR preview
     needs: [list-changed-directories]
     runs-on: ubuntu-latest
@@ -48,7 +48,7 @@ jobs:
 
     steps:
       - name: Test matrix
-        run: echo '${{ matrix.dirs }}'
+        run: echo '${{ matrix.dir }}'
 
       - name: Generate PR preview ID
         id: generate-pr-preview-id
