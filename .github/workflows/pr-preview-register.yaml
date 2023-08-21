@@ -21,7 +21,12 @@ jobs:
         with:
           dir_names: true
           json: true
-          json_raw_format: true
+
+      - name: Display all changed directories
+        run: |
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "$file was changed"
+          done
 
       - name: Generate matrix with all changed directories
         id: set-matrix
