@@ -30,20 +30,21 @@ jobs:
 
       - name: Generate matrix with all changed directories
         id: set-matrix
-        run: |
-          echo "{\"dirs\":${{ steps.changed-files.outputs.all_changed_files }}}"
+        run: echo "{\"dirs\":${{ steps.changed-files.outputs.all_changed_files }}}"
 
     outputs:
       matrix: ${{ steps.set-matrix.outputs.result }}
 
   pr-preview:
-    if: ${{ fromJson(needs.list-changed-directories.outputs.matrix) }}
+    # if: ${{ fromJson(needs.list-changed-directories.outputs.matrix) }}
     name: Register PR preview
-    needs: list-changed-directories
+    needs: [list-changed-directories]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.list-changed-directories.outputs.matrix) }}
+      matrix:
+        dir: ${{ fromJson(needs.list-changed-directories.outputs.matrix) }}
+      max-parallel: 4
 
     steps:
       - name: Test matrix
@@ -51,8 +52,7 @@ jobs:
 
       - name: Generate PR preview ID
         id: generate-pr-preview-id
-        run: |
-          echo "::set-output name=pr-preview-id::$(echo -n \"${{ github.event.organization.login }}${{ github.event.repository.name }}${{ github.event.number }}\" | sha256sum | cut -d " " -f 1 | head -c 7)"
+        run: echo "::set-output name=pr-preview-id::$(echo -n \"${{ github.event.organization.login }}${{ github.event.repository.name }}${{ github.event.number }}\" | sha256sum | cut -d " " -f 1 | head -c 7)"
 
       - name: Register PR preview
         uses: spacelift-io/update-file-action@v1.0.0
