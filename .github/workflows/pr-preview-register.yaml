@@ -20,6 +20,7 @@ jobs:
         uses: tj-actions/changed-files@v37
         with:
           dir_names: true
+          files_ignore: .github/**
           json: true
 
       - name: Generate matrix with all changed directories
